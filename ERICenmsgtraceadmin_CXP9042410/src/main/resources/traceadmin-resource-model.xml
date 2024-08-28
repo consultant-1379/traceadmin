@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configEntity xmlns="http://www.ericsson.com/oss/itpf/deployment/dst/descriptor">
+    <description>traceadmin</description>
+    <singleton>true</singleton>
+    <scaleUnit>
+        <loadDrivers>
+            <loadDriver name="maxSizeofDecodedFileTraceAdmin"
+                        description="Calculated volumes of space required in TFD_CLI filesystem for traceadmin Iso, Logging, Database and Trace Data"/>
+            <loadDriver name="maxSizeofTraceAdminDockerFilesystem"
+                        description="Total size of docker filesystem including docker requirement and application containers"/>
+
+            <!-- Application Logs-->
+            <loadDriver name="ApplicationLogFileSize"
+                        description="Size of each TTA Application Log files in MB"/>
+            <loadDriver name="TTARetentionofApplicationLogs"
+                        description="Total number of retention files"/>
+            <loadDriver name="TTAtotalsizeperServices"
+                        description="Total size per services in TTA"/>
+            <loadDriver name="TTAServices"
+                        description="Services in TTA"/>
+            <loadDriver name="TotalSizeOfApplicationLogs"
+                        description="Total size for Application logs"/>
+            <loadDriver name="BufferForApplicationLogs"
+                        description="Buffer size for Application logs"/>
+            <loadDriver name="maxSizeofApplicationLogs"
+                        description="Final size for Application logs"/>
+
+            <!-- Resource Consumption Logs -->
+            <loadDriver name="TTARetentionofResourceConsumptionLogs"
+                        description="Total number of retention files"/>
+            <loadDriver name="TTAResourceConsumptionFileSize"
+                        description="Resource Consumption log File size"/>
+            <loadDriver name="TotalSizeOfResourceConsumptionLogs"
+                        description="Buffer size for Application logs"/>
+            <loadDriver name="BufferForResourceConsumptionLogs"
+                        description="Buffer size for Resource Consumption logs"/>
+            <loadDriver name="maxSizeofResourceConsumptionLogs"
+                        description="Final size for Application logs"/>
+
+            <!-- ISO -->
+            <loadDriver name="TTAISO"
+                        description="Size For ISO"/>
+            <loadDriver name="TTAMounting"
+                        description="Size for Mounting"/>
+            <loadDriver name="maxSizeofISO"
+                        description="Total size for ISO"/>
+
+            <!-- Database for TTA -->
+            <loadDriver name="TTABasicdatabase"
+                        description="Basix databasesize for TTA in MB"/>
+            <loadDriver name="TTAPerTraceSize"
+                        description="Size of TTA per trace"/>
+            <loadDriver name="TotalDbRetentionDays"
+                        description="Total Db Retention days for TTA"/>
+            <loadDriver name="TotalTraceSize"
+                        description="Total trace size for TTA"/>
+            <loadDriver name="maxSizeofTTADatabase"
+                        description="Total Db space required for TTA"/>
+        </loadDrivers>
+
+        <minimumUnit>
+            <profile>
+                <cpuCores>2</cpuCores>
+                <cpuMinutes>0</cpuMinutes>
+                <peakCpuMinutes>0</peakCpuMinutes>
+                <memory>5120</memory>
+            </profile>
+            <profileConversionFormulae>
+                <cpuCores>2</cpuCores>
+                <cpuMinutes>0</cpuMinutes>
+                <peakCpuMinutes>0</peakCpuMinutes>
+                <memory>(traceadmin_OS+traceadmin_Docker+traceadmin_ApplicationContainers)</memory>
+            </profileConversionFormulae>
+        </minimumUnit>
+
+        <optimalUnit>
+            <profile>
+                <cpuCores>2</cpuCores>
+                <cpuMinutes>0</cpuMinutes>
+                <peakCpuMinutes>0</peakCpuMinutes>
+                <memory>5120</memory>
+            </profile>
+
+            <profileConversionFormulae>
+                <cpuCores>2</cpuCores>
+                <cpuMinutes>0</cpuMinutes>
+                <peakCpuMinutes>0</peakCpuMinutes>
+                <memory>(traceadmin_OS+traceadmin_Docker+traceadmin_ApplicationContainers)</memory>
+            </profileConversionFormulae>
+        </optimalUnit>
+
+    </scaleUnit>
+
+
+    <parameters>
+        <property description="VM memory allocation for OS" name="traceadmin_OS" usage="OPTIONAL" defaultValue="1024"/>
+        <property description="VM memory allocation for Docker" name="traceadmin_Docker" usage="OPTIONAL"
+                  defaultValue="2048"/>
+        <property description="VM memory allocation for ApplicationContainers" name="traceadmin_ApplicationContainers"
+                  usage="OPTIONAL" defaultValue="2048"/>
+        <property description="File System space allocation for Docker" name="traceadminDockerFilesystemMB"
+                  usage="OPTIONAL" defaultValue="1024"/>
+        <property description="File System space allocation for ApplicationContainers"
+                  name="traceadminContainersFilesystemMB"
+                  usage="OPTIONAL" defaultValue="7680"/>
+    </parameters>
+
+
+    <deploymentDependencies>
+        <deploymentDependency>
+            <groupId>OSS/com.ericsson.oss.servicegroupcontainers</groupId>
+            <artifactId>traceadmin</artifactId>
+            <version/>
+            <alias>traceadminsg_Internal_load_driver_calculations_for_ApplicationLogs</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="ApplicationLogFileSize">
+                    10
+                    <!--Allocated Application Logfile size in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTARetentionofApplicationLogs">
+                    (4+1)
+                    <!--Number of application retention files in count -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTAtotalsizeperServices">
+                    (ApplicationLogFileSize*TTARetentionofApplicationLogs)
+                    <!--Allocated total size per services in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTAServices">
+                    5
+                    <!--Allocated TTA services in count -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TotalSizeOfApplicationLogs">
+                    (TTAServices*TTAtotalsizeperServices)
+                    <!--Allocated Total size of application logs without buffer  in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="BufferForApplicationLogs">
+                    50
+                    <!--Allocated Buffer as addition in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofApplicationLogs">
+                    (TotalSizeOfApplicationLogs+BufferForApplicationLogs)
+                    <!--Allocated sum of total size for application logs in MB -->
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+        <deploymentDependency>
+            <groupId>OSS/com.ericsson.oss.servicegroupcontainers</groupId>
+            <artifactId>traceadmin</artifactId>
+            <version/>
+            <alias>traceadminsg_Internal_load_driver_calculations_for_ResourceConsumptionLogs</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="TTARetentionofResourceConsumptionLogs">
+                    3
+                    <!--Allocated TTA Retention of ResourceConsumption Logs in count -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTAResourceConsumptionFileSize">
+                    4
+                    <!--Allocated TTA Resource Consumption File Size in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TotalSizeOfResourceConsumptionLogs">
+                    4
+                    <!--Allocated Total Size Of ResourceConsumption Logs without buffer in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="BufferForResourceConsumptionLogs">
+                    6
+                    <!--Allocated Buffer For ResourceConsumptionLogs in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofResourceConsumptionLogs">
+                (TotalSizeOfResourceConsumptionLogs+BufferForResourceConsumptionLogs)
+                <!--Allocated   maxSize of Resource Consumption Logs in MB -->
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+
+        <deploymentDependency>
+            <groupId>OSS/com.ericsson.oss.servicegroupcontainers</groupId>
+            <artifactId>traceadmin</artifactId>
+            <version/>
+            <alias>traceadminsg_Internal_load_driver_calculations_for_ISO</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="TTAISO">
+                    2000
+                    <!--Allocated ISO size in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTAMounting">
+                    2000
+                    <!--Allocated Mounting size in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofISO">
+                    (TTAISO+TTAMounting)
+                    <!--Allocated TotalsizeforISO in MB -->
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+        <deploymentDependency>
+            <groupId>OSS/com.ericsson.oss.servicegroupcontainers</groupId>
+            <artifactId>traceadmin</artifactId>
+            <version/>
+            <alias>traceadminsg_Internal_load_driver_calculations_for_TTADatabase</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="TTABasicdatabase">
+                    400
+                    <!--AllocatedBasic database size in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TTATracePerDay">
+                    1.5
+                    <!--Allocated TTATracePerDay in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TotalDbRetentionDays">
+                    (4+1)
+                    <!--Retention days for db in number of days -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="TotalTraceSize">
+                    (TotalDbRetentionDays*TTATracePerDay)
+                    <!--Allocated TotalTraceSize in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofTTADatabase">
+                    (TotalTraceSize+TTABasicdatabase)
+                    <!--Allocated TotalDbSize without buffer in MB -->
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+        <deploymentDependency>
+            <groupId>OSS/com.ericsson.oss.presentation.client.tracefiledecoder</groupId>
+            <artifactId>tracefiledecodercli</artifactId>
+            <version/>
+            <alias>traceadmin_Internal_load_driver_calculations</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofDecodedFileTraceAdmin">
+                    (maxSizeofApplicationLogs+maxSizeofResourceConsumptionLogs+maxSizeofISO+maxSizeofTTADatabase)
+                    <!--Allocated Filesytem to celltracedecoder in MB -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="maxSizeofTraceAdminDockerFilesystem">
+                    (traceadminDockerFilesystemMB+traceadminContainersFilesystemMB)
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+
+        <deploymentDependency>
+            <groupId>com.ericsson.nms.litp</groupId>
+            <artifactId>DeploymentManagementTool</artifactId>
+            <version/>
+            <alias>NasFileSystemShare</alias>
+            <qualifier>GLOBAL</qualifier>
+            <loadDriverConverters>
+                <loadConversionFormula dependencyLoadDriver="nasfileSystemName">
+                    tfd_cli
+                    <!--Allocated Filesytem to celltracedecoder -->
+                </loadConversionFormula>
+                <loadConversionFormula dependencyLoadDriver="nasFileSystemSpaceMB">
+                    IF(OR(enm_deployment_type="Extra_Large_ENM",enm_deployment_type="Extra_Large_ENM_On_Rack_Servers",enm_deployment_type="Large_ENM",enm_deployment_type="Medium_ENM"),(maxSizeofDecodedFileTraceAdmin+maxSizeofTraceAdminDockerFilesystem),0)
+                    <!--Level of FileSystemSpacerequired in MB, The calculation for the volume required comes from the application needing space -->
+                </loadConversionFormula>
+
+                <loadConversionFormula dependencyLoadDriver="nasFileSnapSpacePercentage">
+                    0
+                    <!--Level of Space to be reserved in Percentage. This indicates the percentage of FileSystemSpace required to hold snapshots performedduring upgrade. -->
+                </loadConversionFormula>
+            </loadDriverConverters>
+        </deploymentDependency>
+
+    </deploymentDependencies>
+
+</configEntity>

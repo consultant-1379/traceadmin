@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ericsson.nms</groupId>
+        <artifactId>integration</artifactId>
+        <version>15.2.0.40</version>
+    </parent>
+    <groupId>com.ericsson.oss.servicegroupcontainers</groupId>
+    <artifactId>traceadmin</artifactId>
+    <version>1.4.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <url>http://www.ericsson.com</url>
+    <organization>
+        <name>Ericsson</name>
+    </organization>
+
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
+
+    <name>[${project.artifactId}] JEE8 Project</name>
+
+    <properties>
+
+        <ericsson.scm.url>scm:git:[fetch=]ssh://gerritmirror-ha.lmera.ericsson.se:29418/OSS/ENM-Parent/SQ-Gate/com.ericsson.oss.servicegroupcontainers/traceadmin[push=]ssh://gerrit.ericsson.se:29418/OSS/ENM-Parent/SQ-Gate/com.ericsson.oss.servicegroupcontainers/traceadmin</ericsson.scm.url>
+
+    </properties>
+
+    <!--Profiles for site documentation -->
+
+    <!--Profile to deploy latest site -->
+    <profiles>
+        <profile>
+            <id>site_latest</id>
+            <distributionManagement>
+                <site>
+                    <id>site</id>
+                    <name>Site</name>
+                    <url>${site.url}/traceadmin/latest</url>
+                </site>
+            </distributionManagement>
+        </profile>
+
+        <!--Profile to stage site for review -->
+
+        <profile>
+            <id>site_review</id>
+            <distributionManagement>
+                <site>
+                    <id>site</id>
+                    <name>Site</name>
+                    <url>${site.url}</url>
+                </site>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+    <!--Deployment of versioned documentation -->
+    <distributionManagement>
+        <site>
+            <id>site</id>
+            <name>Site</name>
+            <url>${site.url}/traceadmin/${project.version}</url>
+        </site>
+    </distributionManagement>
+
+    <scm>
+        <developerConnection>${ericsson.scm.url}</developerConnection>
+        <connection>${ericsson.scm.url}</connection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <modules>
+        <module>ERICenmsgtraceadmin_CXP9042410</module>
+    </modules>
+</project>

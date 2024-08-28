@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>traceadmin</artifactId>
+    <groupId>com.ericsson.oss.servicegroupcontainers</groupId>
+    <version>1.4.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>ERICenmsgtraceadmin_CXP9042410</artifactId>
+  <name>[${project.parent.artifactId}] RPM module</name>
+  <packaging>${rpm.packaging}</packaging>
+
+  <properties>
+    <publish_artifact>true</publish_artifact>
+    <media.category>scripting</media.category>
+    <com.ericsson.oss.rpm.architecture>noarch</com.ericsson.oss.rpm.architecture>
+  </properties>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>com.ericsson.oss.itpf.deployment</groupId>
+        <artifactId>deployment-descriptor-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>configurable-entity</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configEntity>
+            <stereotype>SERVICE_PKG</stereotype>
+            <parameters>
+              <property name="vm_service_name" defaultValue="traceadmin" />
+              <itemType name="vm-package">
+                <property name="name" defaultValue="ERICenmsgtraceadmin_CXP9042410" />
+              </itemType>
+            </parameters>
+            <deploymentDependencies>
+              <deploymentDependency>
+                <groupId>com.ericsson.oss.itpf.deployment.tools</groupId>
+                <artifactId>virtual-machine</artifactId>
+                <qualifier>CONTAINER</qualifier>
+                <alias>traceadmin-vm</alias>
+              </deploymentDependency>
+            </deploymentDependencies>
+            <assignments>
+              <assign>
+                <path>traceadmin-vm</path>
+                <property name="cluster_name" value="scp_cluster" />
+                <property name="routable_interfaces" value="1" />
+                <property name="storage_routing" value="DIRECT" />
+                <itemType name="vm-service">
+                  <property name="service_name" value="traceadmin" />
+                  <property name="cpus" value="2" />
+                  <property name="ram" value="5120M" />
+                  <property name="image_name" value="rhel7-lsb-image" />
+                </itemType>
+                <itemType name="vcs-clustered-service">
+                  <property name="active" value="1" />
+                  <property name="standby" value="0" />
+                </itemType>
+              </assign>
+              <assign>
+                <path>traceadmin-vm</path>
+                <scope>PHYSICAL_PRODUCTION</scope>
+                <itemType name="vm-service">
+                  <property name="cpus" value="2" />
+                  <property name="ram" value="5120M" />
+                </itemType>
+              </assign>
+              <assign>
+                <path>traceadmin-vm</path>
+                <scope>PHYSICAL_TEST</scope>
+                <itemType name="vm-service">
+                  <property name="cpus" value="2" />
+                  <property name="ram" value="5120M" />
+                </itemType>
+              </assign>
+            </assignments>
+          </configEntity>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>timestamp-property</id>
+            <goals>
+              <goal>timestamp-property</goal>
+            </goals>
+            <configuration>
+              <name>this.year</name>
+              <pattern>yyyy</pattern>
+              <unit>year</unit>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rpm-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <skip>true</skip>
+          <inherited>true</inherited>
+          <license>${this.year} Ericsson AB. All rights reserved</license>
+          <group>ERI-NMS</group>
+          <vendor>Ericsson AB</vendor>
+          <url>www.ericsson.com</url>
+          <requires>
+            <!-- This is an empty RPM. Required for installation of TTA application -->
+            <require>ERICddc_CXP9030294</require>
+            <require>ERICcredentialmanagercli_CXP9031389</require>
+          </requires>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+  </build>
+</project>
